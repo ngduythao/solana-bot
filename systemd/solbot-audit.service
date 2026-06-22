@@ -1,0 +1,7 @@
+[Unit]
+Description=Weekly dependency and layout audit
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solbot_current
+ExecStart=/bin/bash -lc 'bash tools/audit.sh'

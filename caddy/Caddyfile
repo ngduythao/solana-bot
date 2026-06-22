@@ -1,0 +1,25 @@
+{
+    # Optional: email for ACME notifications
+    email you@example.com
+    # Optional: increase timeouts if needed
+    servers {
+        read_timeout 30s
+        write_timeout 30s
+    }
+}
+
+# Replace example.com with your domain (must point A/AAAA to this host)
+example.com {
+    encode zstd gzip
+    @certbot path /.well-known/acme-challenge/*
+    handle @certbot {
+        root * /var/www/certbot
+        file_server
+    }
+    reverse_proxy dashboard:8080
+}
+
+# Optional: HTTP plain for LAN-only (uncomment if you want HTTP on a different port)
+# :8081 {
+#     reverse_proxy dashboard:8080
+# }

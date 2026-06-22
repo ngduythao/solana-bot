@@ -1,0 +1,13 @@
+
+type: object
+required: [program_id, metas]
+properties:
+  program_id: {type: string}
+  metas:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        writable: {type: boolean}
+        signer: {type: boolean}
+      additionalProperties: false

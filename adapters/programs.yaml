@@ -1,0 +1,43 @@
+phoenix:
+  program_id: PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY
+  metas:
+    market:
+      writable: true
+      signer: false
+    owner:
+      writable: true
+      signer: true
+    eventQueue:
+      writable: true
+      signer: false
+    bids:
+      writable: true
+      signer: false
+    asks:
+      writable: true
+      signer: false
+    baseVault:
+      writable: true
+      signer: false
+    quoteVault:
+      writable: true
+      signer: false
+openbook:
+  program_id: opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb
+  metas:
+    market:
+      writable: true
+      signer: false
+    owner:
+      writable: true
+      signer: true
+whirlpool:
+  program_id: whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc
+raydium:
+  program_ids:
+    amm_v4: 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8
+    clmm: CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK
+    cpmm: CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C
+    stable: 5quBtoiQqxF9Jv6KYKctB59NT3gtJD2Y65kdnB1Uev3h
+meteora:
+  program_id: LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo

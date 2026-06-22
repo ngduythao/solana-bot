@@ -1,0 +1,47 @@
+
+# Layout presets (placeholders). Replace offsets with verified values for production.
+whirlpool:
+  SOL_USDC:
+    pool: "POOL_PUBKEY_PLACEHOLDER"
+    poolLayout:
+      sqrtPriceX64: 32
+      liquidity: 72
+      tickCurrent: 88
+      feeBps: 90
+      tickSpacing: 92
+    tickArrays:
+      - pubkey: "TICK_ARRAY_PUBKEY_1"
+        tickArrayStartIndex: -1280
+        entrySize: 16
+        count: 88
+        dataOffset: 8
+      - pubkey: "TICK_ARRAY_PUBKEY_2"
+        tickArrayStartIndex: -640
+        entrySize: 16
+        count: 88
+        dataOffset: 8
+raydium:
+  SOL_USDC:
+    pool: "POOL_PUBKEY_PLACEHOLDER"
+    poolLayout:
+      sqrtPriceX64: 32
+      liquidity: 72
+      tickCurrent: 88
+      feeBps: 90
+      tickSpacing: 92
+    tickPages:
+      - pubkey: "TICK_PAGE_PUBKEY_1"
+        startIndex: -1024
+        entrySize: 16
+        count: 256
+        dataOffset: 0
+meteora:
+  SOL_USDC:
+    lob: "LOB_PUBKEY_PLACEHOLDER"
+    feeBps: 30
+    binLayout:
+      count: 48
+      entrySize: 32
+      offsetPrice: 0
+      offsetLiquidity: 16
+      dataOffset: 0

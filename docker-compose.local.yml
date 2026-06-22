@@ -1,0 +1,172 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: hb-redis-local
+    ports: ["6380:6379"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 2s
+
+  dashboard:
+    image: python:3.11-slim
+    container_name: solbot-dashboard-local
+    working_dir: /app
+    command: ["bash","-lc","pip install -r requirements.txt && python app.py"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      REDIS_URL: "redis://redis:6379/0"
+      CSV_PATH: "/app/analytics.csv"
+      LAT_METRICS: "/app/metrics_latency.csv"
+      JITO_BUNDLES: "0"
+      JITO_ENDPOINT: ""
+      JITO_MODE: "rest"
+      ALERT_WEBHOOK: ""
+      ALERT_TG_TOKEN: ""
+      ALERT_TG_CHAT: ""
+    ports: ["8080:8080"]
+    volumes:
+      - ./dashboard:/app
+      - ./config_local.yaml:/app/config.yaml:ro
+      - ./.env:/app/.env:ro
+      - ./analytics:/app/analytics
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","python","-c","import urllib.request;urllib.request.urlopen('http://localhost:8080/',timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+
+  metrics-exporter:
+    image: python:3.11-slim
+    container_name: hb-metrics-local
+    working_dir: /app
+    volumes: [".:/app"]
+    env_file: [".env"]
+    command: sh -lc "pip install -q fastapi redis python-dotenv uvicorn && python -m uvicorn metrics_exporter.app:app --host 0.0.0.0 --port 9100"
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports: ["9100:9100"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","python","-c","import urllib.request;urllib.request.urlopen('http://localhost:9100/',timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+
+  orchestrator:
+    image: python:3.11-slim
+    container_name: hb-orchestrator-local
+    working_dir: /app
+    volumes: [".:/app"]
+    env_file: [".env"]
+    command: sh -lc "pip install -q redis httpx fastapi uvicorn pynacl requests pyyaml python-dotenv && python orchestrator/main.py"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","pgrep","-f","orchestrator/main.py"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+
+  preselector:
+    image: python:3.11-slim
+    container_name: hb-preselector-local
+    working_dir: /app
+    volumes: [".:/app"]
+    env_file: [".env"]
+    command: sh -lc "pip install -q redis httpx pyyaml python-dotenv && python preselector/preselector.py"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backrun:
+    image: python:3.11-slim
+    container_name: hb-backrun-local
+    working_dir: /app
+    volumes: [".:/app"]
+    env_file: [".env"]
+    command: sh -lc "pip install -q redis python-dotenv && python backrun/backrun.py"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ai-fee-bandit:
+    image: python:3.11-slim
+    container_name: hb-ai-fee-local
+    working_dir: /app
+    volumes: [".:/app"]
+    env_file: [".env"]
+    command: sh -lc "pip install -q fastapi redis python-dotenv uvicorn && python -m uvicorn ai_fee_bandit.app:app --host 0.0.0.0 --port 8092"
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports: ["8092:8092"]
+    restart: unless-stopped
+
+  tuner:
+    image: python:3.11-slim
+    container_name: solbot-tuner-local
+    working_dir: /app
+    command: ["bash","-lc","pip install -r requirements.txt && python tuner.py"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./tuner:/app
+      - ./config_local.yaml:/app/config.yaml
+      - ./.env:/app/.env:ro
+      - ./analytics:/app/analytics
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hb-prom-local
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","wget","-qO-","http://localhost:9090/-/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hb-grafana-local
+    volumes:
+      - ./grafana:/var/lib/grafana
+    ports: ["3001:3000"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","wget","-qO-","http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s

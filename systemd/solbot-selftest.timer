@@ -1,0 +1,9 @@
+[Unit]
+Description=Run solbot self-test daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target

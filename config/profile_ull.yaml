@@ -1,0 +1,10 @@
+
+# Ultra-Low-Latency profile (override hints)
+router:
+  RACE_K: 3
+  ROUTER_TIMEOUT_MS: 220
+rpc_rate_limit:
+  qps: 140
+  burst: 200
+preselector:
+  T1_REQUOTE_BPS: 3

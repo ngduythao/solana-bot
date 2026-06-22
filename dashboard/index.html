@@ -1,0 +1,116 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Solbot Metrics Panel</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>body{font-family:Inter,system-ui,Arial;margin:20px} .grid{display:grid;grid-template-columns:1fr;gap:24px} @media(min-width:1000px){.grid{grid-template-columns:1fr 1fr}}</style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+async function renderLatencySeries(){
+  const s = await j('/api/latency_series');
+  function toXY(arr){
+    return arr.slice(-200).map(x => ({x: new Date((x[0]||0)*1000), y: x[1]}));
+  }
+  const ds1 = toXY(s.det_sim), ds2 = toXY(s.sim_sub), ds3 = toXY(s.det_sub);
+  new Chart(document.getElementById('latencyLine1'), {type:'line', options:{animation:false, parsing:false, scales:{x:{type:'time'}}}, data:{datasets:[{label:'detect→sim', data:ds1}]}});
+  new Chart(document.getElementById('latencyLine2'), {type:'line', options:{animation:false, parsing:false, scales:{x:{type:'time'}}}, data:{datasets:[{label:'sim→submit', data:ds2}]}});
+  new Chart(document.getElementById('latencyLine3'), {type:'line', options:{animation:false, parsing:false, scales:{x:{type:'time'}}}, data:{datasets:[{label:'detect→submit', data:ds3}]}});
+}
+renderLatencySeries();
+setInterval(renderLatencySeries, 2000);
+
+</script>
+</head>
+<body>
+<h2>Solbot — Metrics Panel</h2>
+<div class="grid">
+  <canvas id="latencyDetailed1"></canvas>
+  <canvas id="latencyDetailed2"></canvas>
+  <canvas id="latencyDetailed3"></canvas>
+  <canvas id="failcause"></canvas>
+  <canvas id="pnlHourly"></canvas>
+  <canvas id="pnlDaily"></canvas>
+  <canvas id="acceptance"></canvas>
+
+  <canvas id="latencyRealtime"></canvas>
+  <canvas id="inventory"></canvas>
+  <div id="alerts" style="border:1px solid #ddd;padding:12px;border-radius:8px;max-height:300px;overflow:auto"></div>
+
+  <canvas id="latencyLine1"></canvas>
+  <canvas id="latencyLine2"></canvas>
+  <canvas id="latencyLine3"></canvas>
+
+  <canvas id="rpcLatency"></canvas>
+  <canvas id="routePnl"></canvas>
+
+  <canvas id="cuStats"></canvas>
+  <canvas id="relayAcc"></canvas>
+</div>
+<script>
+async function j(url){const r=await fetch(url); return r.json();}
+
+async function render(){
+  const cu = await j('/api/cu_stats');
+  new Chart(document.getElementById('cuStats'), {type:'bar', data:{labels:['avg','last'], datasets:[{label:'CU', data:[(cu.avg||0),(cu.last||0)]}}]});
+  const ra = await j('/api/relay_acceptance');
+  new Chart(document.getElementById('relayAcc'), {type:'bar', data:{labels:ra.map(x=>x.relay), datasets:[{label:'Accepted', data:ra.map(x=>x.accepted)},{label:'Rejected', data:ra.map(x=>x.rejected)}]}});
+
+  // RPC breakdown
+  const rb = await j('/api/rpc_breakdown');
+  new Chart(document.getElementById('rpcLatency'), {type:'bar', data:{labels:rb.map(x=> (x.is_current?'★ ':'')+x.url.slice(0,40)), datasets:[{label:'lat(ms)', data:rb.map(x=>x.lat_ms)},{label:'err(%)', data:rb.map(x=>x.err_pct)}]}});
+  // Route PnL/sec
+  const rp = await j('/api/route_pnl');
+  new Chart(document.getElementById('routePnl'), {type:'bar', data:{labels:rp.map(x=>x.route.slice(0,28)), datasets:[{label:'PnL/sec', data:rp.map(x=>x.pnlps)}]}});
+
+  // Latency realtime
+  const lt = await j('/api/latency');
+  new Chart(document.getElementById('latencyRealtime'), {type:'bar', data:{labels:['p50','p95'], datasets:[{label:'ms', data:[lt.p50||0, lt.p95||0]}]}});
+  // Inventory
+  const inv = await j('/api/inventory');
+  const labels = inv.list.map(x=>x.token);
+  const usd = inv.list.map(x=>x.usd);
+  new Chart(document.getElementById('inventory'), {type:'bar', data:{labels, datasets:[{label:'USD', data:usd}]}});
+  // Alerts
+  const al = await j('/api/alerts');
+  const wrap = document.getElementById('alerts');
+  wrap.innerHTML = '<b>Recent alerts</b><br/>' + al.map(x => '<div style="margin:6px 0">'+JSON.stringify(x)+'</div>').join('');
+
+  // Fail-cause pie
+  const fc = await j('/api/failcause');
+  new Chart(document.getElementById('failcause'), {type:'pie', data:{labels:Object.keys(fc), datasets:[{data:Object.values(fc)}]}});
+  // PnL hourly
+  const hh = await j('/api/pnl_hourly');
+  new Chart(document.getElementById('pnlHourly'), {type:'line', data:{labels:hh.map(x=>x.ts), datasets:[{label:'Net', data:hh.map(x=>Number(x.net||0))},{label:'Gross', data:hh.map(x=>Number(x.gross||0))},{label:'Fee', data:hh.map(x=>Number(x.fee||0))}]}});
+  // PnL daily
+  const dd = await j('/api/pnl_daily');
+  new Chart(document.getElementById('pnlDaily'), {type:'line', data:{labels:dd.map(x=>x.day), datasets:[{label:'Net', data:dd.map(x=>Number(x.net||0))},{label:'Gross', data:dd.map(x=>Number(x.gross||0))},{label:'Fee', data:dd.map(x=>Number(x.fee||0))}]}});
+  // Acceptance per relay
+  const ac = await j('/api/acceptance');
+  new Chart(document.getElementById('acceptance'), {type:'bar', data:{labels:ac.map(x=>x.relay), datasets:[{label:'Accepted', data:ac.map(x=>x.accepted)},{label:'Rejected', data:ac.map(x=>x.rejected)}]}});
+}
+render();
+setInterval(renderLatencyDetail, 5000);
+async function renderLatencyDetail(){
+  const d = await j('/api/latency_detailed');
+  new Chart(document.getElementById('latencyDetailed1'), {type:'bar', data:{labels:['p50','p95'], datasets:[{label:'detect→sim (ms)', data:[(d.detect_to_sim.p50||0),(d.detect_to_sim.p95||0)]}]}});
+  new Chart(document.getElementById('latencyDetailed2'), {type:'bar', data:{labels:['p50','p95'], datasets:[{label:'sim→submit (ms)', data:[(d.sim_to_submit.p50||0),(d.sim_to_submit.p95||0)]}]}});
+  new Chart(document.getElementById('latencyDetailed3'), {type:'bar', data:{labels:['p50','p95'], datasets:[{label:'detect→submit (ms)', data:[(d.detect_to_submit.p50||0),(d.detect_to_submit.p95||0)]}]}});
+}
+
+async function renderLatencySeries(){
+  const s = await j('/api/latency_series');
+  function toXY(arr){
+    return arr.slice(-200).map(x => ({x: new Date((x[0]||0)*1000), y: x[1]}));
+  }
+  const ds1 = toXY(s.det_sim), ds2 = toXY(s.sim_sub), ds3 = toXY(s.det_sub);
+  new Chart(document.getElementById('latencyLine1'), {type:'line', options:{animation:false, parsing:false, scales:{x:{type:'time'}}}, data:{datasets:[{label:'detect→sim', data:ds1}]}});
+  new Chart(document.getElementById('latencyLine2'), {type:'line', options:{animation:false, parsing:false, scales:{x:{type:'time'}}}, data:{datasets:[{label:'sim→submit', data:ds2}]}});
+  new Chart(document.getElementById('latencyLine3'), {type:'line', options:{animation:false, parsing:false, scales:{x:{type:'time'}}}, data:{datasets:[{label:'detect→submit', data:ds3}]}});
+}
+renderLatencySeries();
+setInterval(renderLatencySeries, 2000);
+
+</script>
+</body>
+</html>

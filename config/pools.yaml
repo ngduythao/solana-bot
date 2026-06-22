@@ -1,0 +1,19 @@
+
+# Program IDs (mainnet)
+programs:
+  orca_whirlpool: "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+  raydium_clmm:   "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK"
+  meteora_dlmm:   "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo"
+
+# Symbol pairs for auto-discovery on first boot (resolved via Jupiter verified token list)
+symbol_pairs:
+  - [ "SOL",  "USDC" ]
+  - [ "JUP",  "USDC" ]
+  - [ "BONK", "USDC" ]
+  - [ "WIF",  "USDC" ]
+
+# Optional: direct token_pairs by mints (if you already know)
+token_pairs: []
+
+# Pools will be appended by tools/discovery.py
+pools: []

@@ -1,0 +1,9 @@
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'solanabot'
+    static_configs:
+      - targets: ['metrics-exporter:8000']

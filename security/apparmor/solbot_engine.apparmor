@@ -1,0 +1,10 @@
+
+#include <tunables/global>
+profile solbot_engine flags=(attach_disconnected) {
+  network,
+  /usr/bin/python3 rix,
+  /bin/bash rix,
+  /usr/bin/bash rix,
+  /root/solbot/** rwk,
+  /opt/solbot/** r,
+}

@@ -1,0 +1,10 @@
+
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: 'solbot'
+    static_configs:
+      - targets: ['metrics-exporter:9100']
+
+rule_files:
+  - /etc/prometheus/alerts.yml

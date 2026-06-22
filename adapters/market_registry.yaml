@@ -1,0 +1,64 @@
+phoenix:
+  SOL_USDC:
+    market: PhxSOLUSDcMarket1111111111111111111111111111
+    owner_placeholder: MakerOwner1111111111111111111111111111111
+    metas:
+      market:
+        writable: true
+        signer: false
+      owner:
+        writable: true
+        signer: true
+  JUP_USDC:
+    market: <PHOENIX_JUP_USDC_MARKET_PUBKEY>
+  WIF_USDC:
+    market: <PHOENIX_WIF_USDC_MARKET_PUBKEY>
+  BONK_USDC:
+    market: <PHOENIX_BONK_USDC_MARKET_PUBKEY>
+openbook:
+  SOL_USDC:
+    market: OBkSOLUSDcMarket1111111111111111111111111111
+    owner_placeholder: MakerOwner1111111111111111111111111111111
+    metas:
+      market:
+        writable: true
+        signer: false
+      owner:
+        writable: true
+        signer: true
+  JUP_USDC:
+    market: <OPENBOOK_JUP_USDC_MARKET_PUBKEY>
+  WIF_USDC:
+    market: <OPENBOOK_WIF_USDC_MARKET_PUBKEY>
+  BONK_USDC:
+    market: <OPENBOOK_BONK_USDC_MARKET_PUBKEY>
+whirlpool:
+  SOL_USDC:
+    pool: <WHIRLPOOL_SOL_USDC_POOL_PUBKEY>
+    tickSpacing: <TS>
+    feeBps: <FEE_BPS>
+  JUP_USDC:
+    pool: <WHIRLPOOL_JUP_USDC_POOL_PUBKEY>
+  WIF_USDC:
+    pool: <WHIRLPOOL_WIF_USDC_POOL_PUBKEY>
+  BONK_USDC:
+    pool: <WHIRLPOOL_BONK_USDC_POOL_PUBKEY>
+raydium:
+  SOL_USDC:
+    pool: <RAYDIUM_SOL_USDC_POOL_PUBKEY>
+    program_variant: amm_v4|clmm|cpmm|stable
+  JUP_USDC:
+    pool: <RAYDIUM_JUP_USDC_POOL_PUBKEY>
+  WIF_USDC:
+    pool: <RAYDIUM_WIF_USDC_POOL_PUBKEY>
+  BONK_USDC:
+    pool: <RAYDIUM_BONK_USDC_POOL_PUBKEY>
+meteora:
+  SOL_USDC:
+    pool: <DLMM_SOL_USDC_POOL_PUBKEY>
+  JUP_USDC:
+    pool: <DLMM_JUP_USDC_POOL_PUBKEY>
+  WIF_USDC:
+    pool: <DLMM_WIF_USDC_POOL_PUBKEY>
+  BONK_USDC:
+    pool: <DLMM_BONK_USDC_POOL_PUBKEY>

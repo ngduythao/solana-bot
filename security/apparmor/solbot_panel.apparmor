@@ -1,0 +1,14 @@
+
+# Very minimal AppArmor profile (example)
+#include <tunables/global>
+profile solbot_panel flags=(attach_disconnected) {
+  network,
+  capability net_bind_service,
+  /usr/bin/python3 rix,
+  /bin/bash rix,
+  /usr/bin/bash rix,
+  /root/** r,
+  /opt/solbot/** r,
+  /root/solbot/** rwk,
+  /root/solbot/logs/** rwk,
+}

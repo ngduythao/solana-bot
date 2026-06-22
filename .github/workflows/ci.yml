@@ -1,0 +1,49 @@
+name: repository-checks
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  static-and-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lint tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yamllint shellcheck
+
+      - name: Lint YAML
+        run: yamllint docker-compose.yml .github/workflows/*.yml config.yaml config_local.yaml
+
+      - name: Bash syntax
+        run: |
+          find . -type f -name "*.sh" -not -path "./.git/*" -not -path "./executor/target/*" -print0 \
+            | xargs -0 -n1 bash -n
+
+      - name: Shellcheck entrypoints
+        run: shellcheck -S error bin/check.sh scripts/install_ubuntu24.sh scripts/lint_env.sh scripts/setup_wizard.sh
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker/Compose version
+        run: |
+          docker --version
+          docker compose version || true
+
+      - name: Prepare local demo env
+        run: |
+          cp .env.example .env
+          mkdir -p secrets analytics certs
+          touch secrets/solana_keypair_hex \
+            secrets/binance_api_key secrets/binance_api_secret \
+            secrets/bybit_api_key secrets/bybit_api_secret
+
+      - name: Validate compose
+        run: docker compose -f docker-compose.yml config

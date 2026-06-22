@@ -1,0 +1,40 @@
+extends: default
+
+rules:
+  # Keep basic sanity, relax style
+  line-length:
+    max: 140
+    level: warning
+  truthy:
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
+    check-keys: false
+  empty-lines:
+    max: 1
+    level: warning
+  indentation:
+    indent-sequences: consistent
+    check-multi-line-strings: false
+  commas:
+    min-spaces-after: 0
+    max-spaces-before: 0
+    level: warning
+  colons:
+    level: warning
+  braces: disable
+  brackets: disable
+  comments-indentation: disable
+  document-start: disable
+
+ignore: |
+  docker-compose.yml
+  docker-compose.*.yml
+  adapters/
+  config/pyth_price_ids.yaml
+  config/pools.yaml
+  config/layouts.yaml
+  config/profile_ull.yaml
+  grafana/
+  configs/
+  prometheus/
+  strategy/
+  .github/

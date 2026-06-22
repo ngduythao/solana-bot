@@ -1,0 +1,9 @@
+
+// Placeholder; replace with official Jito relay proto.
+syntax = "proto3";
+package jito.relay;
+message SubmitRequest { repeated bytes txs = 1; }
+message SubmitResponse { bool accepted = 1; }
+service Relay {
+  rpc SubmitBundle(SubmitRequest) returns (SubmitResponse);
+}

@@ -1,0 +1,123 @@
+tokens: [SOL/USDC, JUP/USDC, BONK/USDC, WIF/USDC]
+
+risk:
+  max_nav_per_trade_bps: 10     # Very conservative for testing
+  slippage_cap_bps: 50          # Higher tolerance for testing
+  hourly_dd_stop_bps: 5         # Conservative stop loss
+  daily_dd_stop_bps: 20         # Conservative daily stop
+  cooldown_seconds: 10          # Longer cooldown for testing
+
+ev:
+  fire_threshold_bps: 2         # Lower threshold for testing
+  min_liquidity_usd: 1000000    # Lower liquidity requirement
+  min_24h_volume_usd: 5000000   # Lower volume requirement
+
+ai:
+  ranking:
+    model: logistic
+    threshold_prob: 0.6         # Lower threshold for testing
+  priority_fee:
+    max_pct_ev: 0.10            # Lower fee budget for testing
+  inventory:
+    mode: target
+    target_base_pct_nav: 0.05    # Lower target for testing
+    hedge_strength: 0.5          # Weaker hedging for testing
+    max_base_pct_nav: 0.15       # Lower max exposure
+    hedge_when_pct_nav_gt: 0.10  # Earlier hedging
+    hedge_fraction: 0.3          # Partial hedging
+  anomaly:
+    depth_drop_bps: 100         # Higher tolerance
+    fee_jump_bps: 50            # Higher tolerance
+    token_blocklist: []
+  scheduler:
+    enable: true
+    boost_hours_utc: [0,1,2,13,14,15,16,20]
+    deboost_hours_utc: [4,5,6]
+
+fees:
+  priority_fee_budget_pct_of_ev: 0.10
+  max_priority_fee_lamports: 10000
+
+rpc:
+  primary: "http://rpc_router:8899"
+  fallback: ["https://api.mainnet-beta.solana.com","https://rpc.solana.wtf/"]
+  submit_timeout_ms: 200        # Longer timeout for testing
+  retry_backoff_ms: 50          # Longer backoff
+  parallel_race: true
+
+strategies:
+  arb_dex_dex: true
+  backrun_basic: false          # Disabled for testing
+  grid_narrow: false
+  auto_hedge: true
+
+backrun:
+  min_swap_usd: 10000           # Lower minimum for testing
+  cooldown_ms: 1000             # Longer cooldown
+
+analytics:
+  enable: true
+  csv_path: /app/analytics.csv
+  rollup_window_minutes: 60
+
+portfolio:
+  nav_usd: 1000                 # Small portfolio for testing
+  quote_token: USDC
+
+dex:
+  use_jupiter: true
+  use_meteora_pools: true
+  dex_allowlist: ["Raydium","Orca","Meteora"]
+  only_direct_routes: true
+
+# === Testing Limits ===
+limits:
+  max_hops: 2                   # Simpler routes for testing
+  max_cu_per_tx: 500000         # Lower CU limit
+  price_limit_bps: 50           # Higher price tolerance
+
+# === Alerting (Optional) ===
+alerts:
+  webhook_url: ""
+  min_level: "warn"
+
+# === Testing Risk ===
+risk_advanced:
+  per_route_loss_cap_usd: 10    # Very small loss cap
+  shadow_mode: true             # Enable shadow mode
+
+# === Testing Alert rules ===
+alerts_rules:
+  drift_bps_warn: 10
+  drift_bps_drop: 20
+  rpc_unhealthy_threshold: 6
+  dd_stop_trigger_bps: 50
+
+# === Testing sizing & breakers ===
+dynamic_sizing:
+  vola_window_trades: 50        # Smaller window
+  min_size_usd: 10              # Very small minimum
+  max_size_usd: 100             # Small maximum
+  target_vola_bps: 50           # Lower volatility target
+
+breakers:
+  per_pair_loss_cap_usd: 20     # Small loss cap
+  max_consecutive_fails: 5      # Lower fail tolerance
+
+# === Testing Metrics ===
+metrics:
+  metrics_path: "metrics.csv"
+
+backoff:
+  ws_initial: 0.5
+  ws_max: 8.0
+
+jito:
+  tip_min: 1000
+  tip_max: 50000
+  tip_step: 1000
+
+hybrid:
+  enable_funding: false         # Disabled for testing
+  enable_liquidation: false     # Disabled for testing
+  auto_hedge_cex: false         # Disabled for testing

@@ -1,0 +1,40 @@
+
+# strategy/strategy.yaml — focus 4 pairs only, with per-pair risk caps
+pairs:
+  SOL_USDC:
+    enabled: true
+    max_q0: 1500000      # max base size unit (q0) per attempt
+    max_dd: 2000000      # max drawdown allowed per session for this pair
+    ev_min: 0.58         # min AI p_win to engage
+  JUP_USDC:
+    enabled: true
+    max_q0: 1200000
+    max_dd: 1500000
+    ev_min: 0.60
+  WIF_USDC:
+    enabled: true
+    max_q0: 900000
+    max_dd: 1200000
+    ev_min: 0.62
+  BONK_USDC:
+    enabled: true
+    max_q0: 900000
+    max_dd: 1200000
+    ev_min: 0.62
+
+stealth:
+  private_bundle_only: true        # never use public RPC path
+  jitter_ms: [3, 18]               # random stagger
+  split_parts: [2, 4]              # split order parts
+  route_shuffle: true              # randomize route pool sequence
+  relay_subset: 2                  # use top-K relays at a time
+  min_accept: 0.5                  # require lane accept >= 50%
+  max_p95_ms: 1400                 # require lane p95 <= 1.4s
+
+surprise_burst:
+  enable: true
+  ev_gate: 0.72                    # if AI p_win >= gate & lane healthy -> temporary size boost
+  boost_mult: 1.35                 # capped by per-pair max_q0
+
+shadow_mode:
+  enable: false                    # paper trade without signing real tx (planner + sim only)

@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  preselector:
+    image: solbotpro-preselector:arm64
+    build: null
+  backrun:
+    image: solbotpro-backrun:arm64
+    build: null

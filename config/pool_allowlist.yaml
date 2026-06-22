@@ -1,0 +1,7 @@
+# Thêm pubkey pool cụ thể để bật guard on-chain chặt hơn (mỗi dòng là 1 pubkey)
+raydium_pools:
+  - 8HoQnePLqPj4M7PUDzfw8e3Ymdwgc7NLGNA9pqmP6AXw   # ví dụ RAY-SOL v3 (placeholder)
+orca_pools:
+  - 9WwFFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   # điền pubkey thật
+meteora_pools:
+  - 5abcDExxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   # điền pubkey thật

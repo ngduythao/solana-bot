@@ -1,0 +1,9 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY preselector/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+COPY preselector /app
+COPY ai /app/ai
+COPY probes /app/probes
+COPY config.yaml /app/config.yaml
+COPY config /app/config

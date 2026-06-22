@@ -1,0 +1,10 @@
+# Strict whitelist (fill by autodiscover script)
+program_ids:
+  - AmmV4...RaydiumProgramIDHere
+  - OrcaWhirlpoolProgramIDHere
+  - MeteoraDLMMProgramIDHere
+pool_ids: []
+mints:
+  - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v   # USDC
+  - So11111111111111111111111111111111111111112   # SOL
+  # add JUP/BONK/WIF mints…

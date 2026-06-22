@@ -1,0 +1,21 @@
+
+groups:
+- name: solbot-guards
+  rules:
+  - alert: FeeBurnTooHigh
+    expr: fee_burn_ratio > 0.4
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      description: "Fee burn ratio > 40% of gross PnL"
+
+  - alert: RpcLatencyHigh
+    expr: rpc_latency_p95 > 150
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      description: "RPC latency p95 above 150ms"
+
+# Note: rpc_latency_p95 can be scraped from exporter or pushed as a gauge via textfile/redis-exporter approach.

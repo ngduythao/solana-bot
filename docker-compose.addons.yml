@@ -1,0 +1,163 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: hb-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  dashboard:
+    image: python:3.11-slim
+    container_name: solbotultrax-dashboard
+    working_dir: /app
+    command: ["bash","-lc","pip install -r requirements.txt && python app.py"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+      REDIS_URL: "redis://redis:6379/0"
+      CSV_PATH: "/app/analytics.csv"
+      LAT_METRICS: "/app/metrics_latency.csv"
+      JITO_BUNDLES: "0"
+      JITO_ENDPOINT: ""
+      JITO_MODE: "rest"
+      ALERT_WEBHOOK: ""
+      ALERT_TG_TOKEN: ""
+      ALERT_TG_CHAT: ""
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ./dashboard:/app
+      - ./config.yaml:/app/config.yaml:ro
+      - ./.env:/app/.env:ro
+      - ./analytics:/app/analytics
+      - ./certs:/app/certs:ro
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  tuner:
+    image: python:3.11-slim
+    container_name: solbotultrax-tuner
+    working_dir: /app
+    command: ["bash","-lc","pip install -r requirements.txt && python tuner.py"]
+    environment:
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./tuner:/app
+      - ./config.yaml:/app/config.yaml
+      - ./.env:/app/.env:ro
+      - ./analytics:/app/analytics
+    restart: unless-stopped
+
+  orchestrator:
+    image: python:3.11-slim
+    container_name: hb-orchestrator
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file: [".env"]
+    command: sh -lc "pip install -q redis httpx fastapi uvicorn pynacl requests && python orchestrator/main.py"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  metrics-exporter:
+    image: python:3.11-slim
+    container_name: hb-metrics
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file: [".env"]
+    command: sh -lc "pip install -q fastapi redis python-dotenv uvicorn && python -m uvicorn metrics_exporter.app:app --host 0.0.0.0 --port 9100"
+    depends_on:
+      - redis
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hb-prom
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hb-grafana
+    volumes:
+      - ./grafana:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+
+  signer:
+    image: python:3.11-slim
+    container_name: hb-signer
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file: [".env"]
+    secrets:
+      - solana_keypair_hex
+    command: sh -lc "pip install -q fastapi uvicorn pynacl redis && python -m uvicorn signer.tx_signer:app --host 0.0.0.0 --port 7001"
+    ports:
+      - "7001:7001"
+    restart: unless-stopped
+
+  ops-guard:
+    image: python:3.11-slim
+    container_name: hb-ops-guard
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file: [".env"]
+    command: sh -lc "pip install -q redis requests && python guard/ops_guard.py"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  cex-orchestrator:
+    image: python:3.11-slim
+    container_name: hb-cex-orch
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file: [".env"]
+    command: sh -lc "pip install -q redis requests && python orchestrator/cex_orchestrator.py"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  hedger:
+    image: python:3.11-slim
+    container_name: hb-hedger
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file: [".env"]
+    secrets:
+      - binance_api_key
+      - binance_api_secret
+      - bybit_api_key
+      - bybit_api_secret
+    command: sh -lc "pip install -q redis requests && python hedge/cex_hedger.py"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+secrets:
+  solana_keypair_hex:
+    file: ./secrets/solana_keypair_hex
+  binance_api_key:
+    file: ./secrets/binance_api_key
+  binance_api_secret:
+    file: ./secrets/binance_api_secret
+  bybit_api_key:
+    file: ./secrets/bybit_api_key
+  bybit_api_secret:
+    file: ./secrets/bybit_api_secret

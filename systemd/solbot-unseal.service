@@ -1,0 +1,9 @@
+[Unit]
+Description=Unseal Solbot wallet to tmpfs
+Before=solbot.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solbot_current
+EnvironmentFile=/opt/solbot_current/.env
+ExecStart=/bin/bash -lc '/opt/solbot_current/scripts/unseal_wallet.sh'

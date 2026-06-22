@@ -1,0 +1,7 @@
+[Unit]
+Description=Solbot daily self-test & reports
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solbot
+ExecStart=/bin/bash -lc 'docker compose ps && python tools/benchmark_p95.py || true'

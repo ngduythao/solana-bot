@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch SSH logins and trigger panic
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/solbot_current
+EnvironmentFile=/opt/solbot_current/.env
+ExecStart=/bin/bash -lc '/opt/solbot_current/scripts/ssh_watch.sh'
+Restart=always
+RestartSec=5s

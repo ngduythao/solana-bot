@@ -1,0 +1,15 @@
+
+[Unit]
+Description=Solana Bot One-Click Stack
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solanabot
+ExecStart=/usr/bin/bash scripts/run_oneclick.sh
+RemainAfterExit=yes
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

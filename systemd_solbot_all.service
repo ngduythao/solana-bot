@@ -1,0 +1,16 @@
+[Unit]
+Description=Solbot All-In-One (engine + panel)
+After=network-online.target redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/solbot
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/bin/bash -lc 'cd %h/solbot && ./scripts/launch_all.sh'
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

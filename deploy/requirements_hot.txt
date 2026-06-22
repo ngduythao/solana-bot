@@ -1,0 +1,5 @@
+
+httpx>=0.24
+solana
+solders
+pynacl

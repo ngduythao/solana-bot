@@ -1,0 +1,12 @@
+
+[package]
+name = "jito_grpc_client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+# Add tonic/prost when you wire real proto:
+# tonic = "0.12"
+# prost = "0.13"
+# tokio = { version = "1", features = ["rt-multi-thread","macros"] }

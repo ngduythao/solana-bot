@@ -1,0 +1,13 @@
+services:
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+  tuner:
+    build:
+      context: ./tuner
+      dockerfile: Dockerfile
+  metrics-exporter:
+    build:
+      context: ./metrics_exporter
+      dockerfile: Dockerfile

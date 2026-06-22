@@ -1,0 +1,24 @@
+
+services:
+  rpc_router:
+    environment:
+      - RACE_K=3
+      - ROUTER_TIMEOUT_MS=220
+  alerts_runner:
+    environment:
+      - DD_STOP_BPS=150
+  compute_tuner:
+    environment:
+      - CU_MULT_MAX=2.5
+      - PF_MULT_MAX=3.0
+  rpc_router_ws:
+    image: python:3.11-slim
+    working_dir: /app
+    command: ["bash","-lc","pip install websockets redis && python ws_listener.py"]
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - ONCHAIN_WS=wss://api.mainnet-beta.solana.com
+    volumes:
+      - ./rpc_router:/app
+    depends_on:
+      - redis

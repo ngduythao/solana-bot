@@ -1,0 +1,119 @@
+tokens: [SOL/USDC, JUP/USDC, BONK/USDC, WIF/USDC]
+
+risk:
+  max_nav_per_trade_bps: 40     # chặt hơn để hạn chế tail risk
+  slippage_cap_bps: 20
+  hourly_dd_stop_bps: 10
+  daily_dd_stop_bps: 80
+  cooldown_seconds: 8
+
+ev:
+  fire_threshold_bps: 3
+  min_liquidity_usd: 2000000
+  min_24h_volume_usd: 10000000
+
+ai:
+  ranking:
+    model: logistic
+    threshold_prob: 0.7          # siết để giảm false-positive
+  priority_fee:
+    max_pct_ev: 0.18             # bớt đốt EV
+  inventory:
+    mode: target
+    target_base_pct_nav: 0.10
+    hedge_strength: 1.0
+    max_base_pct_nav: 0.30
+    hedge_when_pct_nav_gt: 0.20
+    hedge_fraction: 0.5
+  anomaly:
+    depth_drop_bps: 50
+    fee_jump_bps: 20
+    token_blocklist: []
+  scheduler:
+    enable: true
+    boost_hours_utc: [0,1,2,13,14,15,16,20]
+    deboost_hours_utc: [4,5,6]
+
+fees:
+  priority_fee_budget_pct_of_ev: 0.18
+  max_priority_fee_lamports: 22000
+
+rpc:
+  primary: "http://rpc_router:8899"
+  fallback: ["https://api.mainnet-beta.solana.com","https://rpc.solana.wtf/"]
+  submit_timeout_ms: 120
+  retry_backoff_ms: 30
+  parallel_race: true
+
+strategies:
+  arb_dex_dex: true
+  backrun_basic: true
+  grid_narrow: false
+  auto_hedge: true
+
+backrun:
+  min_swap_usd: 40000
+  cooldown_ms: 400
+
+analytics:
+  enable: true
+  csv_path: /app/analytics.csv
+  rollup_window_minutes: 60
+
+portfolio:
+  nav_usd: 10000
+  quote_token: USDC
+
+dex:
+  use_jupiter: true
+  use_meteora_pools: true
+  dex_allowlist: ["Raydium","Orca","Meteora"]
+  only_direct_routes: true
+
+# === B-pack limits ===
+limits:
+  max_hops: 3           # max legs in a route
+  max_cu_per_tx: 700000  # CU safety cap per tx
+  price_limit_bps: 35   # per-leg price guard
+
+alerts:
+  webhook_url: "${ALERT_WEBHOOK}"   # e.g. Discord/Slack/Telegram webhook (leave blank to disable)
+  min_level: "warn"                 # info|warn|error
+
+# === C-pack Risk ===
+risk_advanced:
+  per_route_loss_cap_usd: 50   # stop trading a specific route for the day after absolute loss exceeds this
+  shadow_mode: false           # if true, no on-chain submit; log-only
+
+# === C-pack Alert rules ===
+alerts_rules:
+  drift_bps_warn: 5
+  drift_bps_drop: 10
+  rpc_unhealthy_threshold: 4
+  dd_stop_trigger_bps: 120     # daily drawdown bps trigger for alert
+
+# === D-pack sizing & breakers ===
+dynamic_sizing:
+  vola_window_trades: 100     # window to compute realized vol on pnl_usd
+  min_size_usd: 50
+  max_size_usd: 2500
+  target_vola_bps: 80         # scale position so that expected pnl volatility ~ this
+breakers:
+  per_pair_loss_cap_usd: 150  # stop per pair for the day on exceeding this loss
+  max_consecutive_fails: 8    # pause pair if consecutive fails exceed
+
+# === Runtime extensions ===
+metrics:
+  metrics_path: "metrics.csv"
+backoff:
+  ws_initial: 0.4
+  ws_max: 6.0
+jito:
+  tip_min: 5000
+  tip_max: 200000
+  tip_step: 2500
+
+hybrid:
+  enable_funding: true
+  enable_liquidation: true
+  auto_hedge_cex: false

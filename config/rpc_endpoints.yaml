@@ -1,0 +1,20 @@
+regions:
+  - name: us
+    endpoints:
+      - https://rpc.helius.xyz/?api-key=${HELIUS_KEY}
+      - https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}
+  - name: eu
+    endpoints:
+      - https://eu.rpcpool.com
+      - https://api.mainnet-beta.solana.com
+  - name: asia
+    endpoints:
+      - https://rpc.solana.com
+      - https://rpc.solana.wtf/
+health:
+  timeout_ms: 350
+  unhealthy_after_failures: 2
+  recovery_successes: 3
+rate_limit:
+  qps: 80
+  burst: 120
